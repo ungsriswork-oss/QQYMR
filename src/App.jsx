@@ -4,7 +4,7 @@ export default function SmartQueueDisplay() {
   const [queues, setQueues] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isRefillMode, setIsRefillMode] = useState(false); 
-  const [gridSize, setGridSize] = useState(6); // State สำหรับกำหนดจำนวนช่อง (6 หรือ 12)
+  const [gridSize, setGridSize] = useState(6); 
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -37,7 +37,6 @@ export default function SmartQueueDisplay() {
           isRefill: isRefillMode 
         };
 
-        // ตัด array ตามจำนวนช่องที่เลือกไว้ (gridSize)
         setQueues((prev) => [newQueue, ...prev].slice(0, gridSize));
       }
       setInputValue(''); 
@@ -45,17 +44,17 @@ export default function SmartQueueDisplay() {
   };
 
   const QueueCard = ({ data, isNewest }) => {
-    // กำหนดขนาดฟอนต์ตามจำนวนช่อง (ถ้า 12 ช่อง ฟอนต์จะเล็กลงครึ่งนึง)
+    // แก้ไขขนาดฟอนต์ให้ใช้ vmin เพื่อให้พอดีกับความสูงหน้าจอ ไม่ดันกรอบล้น
     const fontSizes = gridSize === 6 ? {
-      number: 'clamp(100px, 14vw, 190px)',
-      channelText: 'clamp(45px, 6vw, 90px)',
-      channelNum: 'clamp(80px, 11.2vw, 150px)',
-      badge: 'clamp(14px, 1.5vw, 20px)'
+      number: 'clamp(60px, 15vmin, 180px)', 
+      channelText: 'clamp(30px, 5vmin, 80px)',
+      channelNum: 'clamp(50px, 12vmin, 140px)',
+      badge: 'clamp(12px, 1.5vmin, 20px)'
     } : {
-      number: 'clamp(60px, 8vw, 110px)',
-      channelText: 'clamp(24px, 3vw, 50px)',
-      channelNum: 'clamp(50px, 6vw, 85px)',
-      badge: 'clamp(10px, 1vw, 14px)'
+      number: 'clamp(40px, 10vmin, 110px)',
+      channelText: 'clamp(20px, 3vmin, 50px)',
+      channelNum: 'clamp(30px, 8vmin, 85px)',
+      badge: 'clamp(10px, 1vmin, 14px)'
     };
 
     if (!data) {
@@ -65,7 +64,7 @@ export default function SmartQueueDisplay() {
           justifyContent: 'center', alignItems: 'center', height: '100%',
           boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px dashed #D1D5DB'
         }}>
-          <div style={{ fontSize: 'clamp(20px, 3vw, 40px)', color: '#D1D5DB', fontWeight: 'bold' }}>-- ว่าง --</div>
+          <div style={{ fontSize: 'clamp(20px, 3vmin, 40px)', color: '#D1D5DB', fontWeight: 'bold' }}>-- ว่าง --</div>
         </div>
       );
     }
@@ -106,7 +105,7 @@ export default function SmartQueueDisplay() {
         <div style={{ 
           flex: 1.2, display: 'flex', justifyContent: 'center', alignItems: 'center',
           backgroundColor: data.isRefill ? '#FEE2E2' : '#ffffff', 
-          position: 'relative'
+          position: 'relative', minHeight: 0 // ป้องกันส่วนบนดันกรอบล้น
         }}>
           <div style={{ 
             fontSize: fontSizes.number, 
@@ -121,7 +120,8 @@ export default function SmartQueueDisplay() {
         
         <div style={{ 
           flex: 0.8, backgroundColor: '#556B2F', 
-          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px'
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
+          minHeight: 0 // ป้องกันส่วนล่างดันกรอบล้น
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
             <span style={{ 
@@ -147,7 +147,6 @@ export default function SmartQueueDisplay() {
     displayQueues.push(null);
   }
 
-  // คำนวณ Columns และ Rows ตามจำนวน Grid Size
   const gridTemplateColumns = gridSize === 6 ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)';
   const gridTemplateRows = gridSize === 6 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
 
@@ -175,7 +174,8 @@ export default function SmartQueueDisplay() {
         <main style={{ 
           flex: 1, padding: '15px', display: 'grid', gap: '15px',
           gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows,    
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          minHeight: 0 // **จุดสำคัญ** บังคับให้ตารางกริดห้ามดันขอบหน้าจอทะลุ
         }}>
           {displayQueues.map((q, index) => (
             <QueueCard 
@@ -189,13 +189,13 @@ export default function SmartQueueDisplay() {
         <header style={{ 
           backgroundColor: '#111827', padding: '8px 20px', 
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          boxShadow: '0 -2px 10px rgba(0,0,0,0.2)', zIndex: 10
+          boxShadow: '0 -2px 10px rgba(0,0,0,0.2)', zIndex: 10,
+          flexShrink: 0 // **จุดสำคัญ** บังคับให้แถบควบคุมห้ามหดตัวเด็ดขาด
         }}>
           <h1 style={{ margin: 0, color: '#F9FAFB', fontSize: '18px' }}>ระบบเรียกคิว</h1>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             
-            {/* ปุ่มเปลี่ยนโหมดแสดงผล (6 หรือ 12 ช่อง) */}
             <button 
               onClick={() => {
                 setGridSize(gridSize === 6 ? 12 : 6);
