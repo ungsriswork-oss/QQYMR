@@ -44,17 +44,17 @@ export default function SmartQueueDisplay() {
   };
 
   const QueueCard = ({ data, isNewest }) => {
-    // ปรับลดขนาดตัวหนังสือคำว่า "รับยาช่อง" ลงนิดหน่อยเพื่อให้มีพื้นที่พอ แต่เลขช่องยังใหญ่สุดๆ
+    // ปรับขนาดฟอนต์ของโหมด 12 ช่อง ให้เลขคิวใหญ่ขึ้นเกือบเท่าตัว!
     const fontSizes = gridSize === 6 ? {
       number: 'clamp(80px, 22vmin, 260px)',     
-      channelText: 'clamp(45px, 10vmin, 110px)',  // ปรับให้เหมาะกับคำว่า "รับยาช่อง"
+      channelText: 'clamp(45px, 10vmin, 110px)',  
       channelNum: 'clamp(60px, 14vmin, 160px)',   
       badge: 'clamp(14px, 1.8vmin, 24px)'
     } : {
-      number: 'clamp(50px, 12vmin, 140px)',
-      channelText: 'clamp(30px, 6vmin, 70px)',    // ปรับให้เหมาะกับโหมด 12 ช่อง
-      channelNum: 'clamp(40px, 10vmin, 100px)',
-      badge: 'clamp(10px, 1.2vmin, 16px)'
+      number: 'clamp(60px, 18vmin, 220px)',       // อัดให้ใหญ่ขึ้นจาก 12vmin เป็น 18vmin เพดาน 220px
+      channelText: 'clamp(28px, 5vmin, 80px)',    // ขยายคำว่ารับยาช่องขึ้นนิดนึงให้สมดุล
+      channelNum: 'clamp(40px, 8vmin, 110px)',    // ขยายเลขช่องขึ้นนิดนึง
+      badge: 'clamp(12px, 1.5vmin, 18px)'
     };
 
     if (!data) {
@@ -114,7 +114,8 @@ export default function SmartQueueDisplay() {
             fontWeight: '900', 
             color: data.isRefill ? '#7F1D1D' : '#1F2937', 
             lineHeight: '1', letterSpacing: '2px',
-            marginTop: '15px' 
+            // ปรับระยะด้านบนนิดหน่อย เพื่อให้เลขคิว 12 ช่องอยู่กึ่งกลางสวยๆ
+            marginTop: gridSize === 6 ? '15px' : '5px' 
           }}>
             {data.number}
           </div>
@@ -127,7 +128,7 @@ export default function SmartQueueDisplay() {
           display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
           minHeight: 0 
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: gridSize === 6 ? '15px' : '10px' }}>
             <span style={{ 
               fontSize: fontSizes.channelText, 
               color: '#ffffff', fontWeight: '900',
