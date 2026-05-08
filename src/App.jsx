@@ -37,14 +37,14 @@ export default function SmartQueueDisplay() {
           isRefill: isRefillMode 
         };
 
-        setQueues((prev) => [newQueue, ...prev].slice(0, gridSize));
+        // *จุดแก้ที่ 1*: เก็บประวัติไว้ 12 คิวเสมอ เพื่อไม่ให้ข้อมูลหายเวลาสลับโหมด
+        setQueues((prev) => [newQueue, ...prev].slice(0, 12));
       }
       setInputValue(''); 
     }
   };
 
   const QueueCard = ({ data, isNewest }) => {
-    // แก้ไขขนาดฟอนต์ให้ใช้ vmin เพื่อให้พอดีกับความสูงหน้าจอ ไม่ดันกรอบล้น
     const fontSizes = gridSize === 6 ? {
       number: 'clamp(60px, 15vmin, 180px)', 
       channelText: 'clamp(30px, 5vmin, 80px)',
@@ -105,7 +105,7 @@ export default function SmartQueueDisplay() {
         <div style={{ 
           flex: 1.2, display: 'flex', justifyContent: 'center', alignItems: 'center',
           backgroundColor: data.isRefill ? '#FEE2E2' : '#ffffff', 
-          position: 'relative', minHeight: 0 // ป้องกันส่วนบนดันกรอบล้น
+          position: 'relative', minHeight: 0 
         }}>
           <div style={{ 
             fontSize: fontSizes.number, 
@@ -121,7 +121,7 @@ export default function SmartQueueDisplay() {
         <div style={{ 
           flex: 0.8, backgroundColor: '#556B2F', 
           display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
-          minHeight: 0 // ป้องกันส่วนล่างดันกรอบล้น
+          minHeight: 0 
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '15px' }}>
             <span style={{ 
@@ -142,7 +142,9 @@ export default function SmartQueueDisplay() {
     );
   };
 
-  const displayQueues = [...queues];
+  // *จุดแก้ที่ 2*: ดึงคิวมาแสดงผลตามจำนวนช่องหน้าจอแบบเป๊ะๆ (ตัดปัญหาคิวล้นทะลัก)
+  const displayQueues = queues.slice(0, gridSize); 
+  
   while (displayQueues.length < gridSize) {
     displayQueues.push(null);
   }
@@ -175,7 +177,8 @@ export default function SmartQueueDisplay() {
           flex: 1, padding: '15px', display: 'grid', gap: '15px',
           gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows,    
           boxSizing: 'border-box',
-          minHeight: 0 // **จุดสำคัญ** บังคับให้ตารางกริดห้ามดันขอบหน้าจอทะลุ
+          minHeight: 0,
+          overflow: 'hidden' // *จุดป้องกัน*: ถ้ามีอะไรแปลกๆ ล้นมาอีก ให้ตัดทิ้งเลย ห้ามดันแถบล่างเด็ดขาด
         }}>
           {displayQueues.map((q, index) => (
             <QueueCard 
@@ -190,7 +193,7 @@ export default function SmartQueueDisplay() {
           backgroundColor: '#111827', padding: '8px 20px', 
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           boxShadow: '0 -2px 10px rgba(0,0,0,0.2)', zIndex: 10,
-          flexShrink: 0 // **จุดสำคัญ** บังคับให้แถบควบคุมห้ามหดตัวเด็ดขาด
+          flexShrink: 0
         }}>
           <h1 style={{ margin: 0, color: '#F9FAFB', fontSize: '18px' }}>ระบบเรียกคิว</h1>
           
