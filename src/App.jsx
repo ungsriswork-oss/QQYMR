@@ -44,15 +44,15 @@ export default function SmartQueueDisplay() {
   };
 
   const QueueCard = ({ data, isNewest }) => {
-    // ปรับให้ขนาดฟอนต์ของคำว่า "ช่อง" ใหญ่เท่ากับตัวเลขเป๊ะๆ
+    // ปรับลดขนาดตัวหนังสือคำว่า "รับยาช่อง" ลงนิดหน่อยเพื่อให้มีพื้นที่พอ แต่เลขช่องยังใหญ่สุดๆ
     const fontSizes = gridSize === 6 ? {
       number: 'clamp(80px, 22vmin, 260px)',     
-      channelText: 'clamp(60px, 14vmin, 160px)',  // ขยายให้เท่ากับ channelNum
+      channelText: 'clamp(45px, 10vmin, 110px)',  // ปรับให้เหมาะกับคำว่า "รับยาช่อง"
       channelNum: 'clamp(60px, 14vmin, 160px)',   
       badge: 'clamp(14px, 1.8vmin, 24px)'
     } : {
       number: 'clamp(50px, 12vmin, 140px)',
-      channelText: 'clamp(40px, 10vmin, 100px)',  // ขยายให้เท่ากับ channelNum
+      channelText: 'clamp(30px, 6vmin, 70px)',    // ปรับให้เหมาะกับโหมด 12 ช่อง
       channelNum: 'clamp(40px, 10vmin, 100px)',
       badge: 'clamp(10px, 1.2vmin, 16px)'
     };
@@ -102,7 +102,7 @@ export default function SmartQueueDisplay() {
           </div>
         )}
 
-        {/* ครึ่งบน: พื้นที่สีขาวสำหรับเลขคิว */}
+        {/* ครึ่งบน: เลขคิว */}
         <div style={{ 
           flex: 7, 
           display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -120,20 +120,20 @@ export default function SmartQueueDisplay() {
           </div>
         </div>
         
-        {/* ครึ่งล่าง: พื้นที่สีเขียว */}
+        {/* ครึ่งล่าง: รับยาช่อง */}
         <div style={{ 
           flex: 2.5, 
           backgroundColor: '#556B2F', 
           display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
           minHeight: 0 
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <span style={{ 
               fontSize: fontSizes.channelText, 
-              color: '#ffffff', fontWeight: '900', // ปรับให้หนาเท่าตัวเลข
+              color: '#ffffff', fontWeight: '900',
               textShadow: '3px 3px 6px rgba(0,0,0,0.4)', lineHeight: '0.85'
             }}>
-              ช่อง
+              รับยาช่อง
             </span>
             <span style={{ 
               fontSize: fontSizes.channelNum, 
@@ -234,7 +234,7 @@ export default function SmartQueueDisplay() {
                 transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
               }}
             >
-              <span>{isRefillMode ? '💊 โหมด: คิวด่วน' : 'โหมด: คิวปกติ'}</span>
+              <span>{isRefillMode ? 'ด่วน' : 'ปกติ'}</span>
               <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#D1D5DB' }}>
                 (กด * สลับ)
               </span>
