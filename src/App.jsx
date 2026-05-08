@@ -71,7 +71,7 @@ export default function SmartQueueDisplay() {
             fontSize: 'clamp(14px, 1.5vw, 20px)', fontWeight: 'bold',
             boxShadow: '0 4px 10px rgba(153, 27, 27, 0.4)', zIndex: 5
           }}>
-            💊 คิวรีฟิลยา
+             คิวด่วน
           </div>
         ) : (
           <div style={{
