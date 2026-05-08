@@ -6,9 +6,16 @@ export default function SmartQueueDisplay() {
   const [isRefillMode, setIsRefillMode] = useState(false); 
   const inputRef = useRef(null);
 
+  // บังคับให้ Cursor กลับมารอที่ช่องพิมพ์เสมอเมื่อมีการคีย์หรือเปลี่ยนโหมด
   useEffect(() => {
     inputRef.current?.focus();
   }, [queues, isRefillMode]);
+
+  // ฟังก์ชันล้างกระดาน (เคลียร์คิว)
+  const handleClearQueue = () => {
+    setQueues([]); // ล้างข้อมูลคิวทั้งหมด
+    inputRef.current?.focus(); // ดึงโฟกัสกลับไปที่ช่องพิมพ์ทันที
+  };
 
   const handleKeyDown = (e) => {
     if (['*', '/', '+', '-'].includes(e.key)) {
@@ -25,7 +32,7 @@ export default function SmartQueueDisplay() {
         const numStr = val.substring(1); 
 
         const newQueue = { 
-          id: Date.now(), // ใช้เวลาปัจจุบันเป็น ID เพื่อบังคับให้ React วาดการ์ดใหม่ทุกครั้งที่กด
+          id: Date.now(),
           number: numStr, 
           channel: channelStr,
           isRefill: isRefillMode 
@@ -52,12 +59,12 @@ export default function SmartQueueDisplay() {
 
     return (
       <div 
-        className={isNewest ? 'card-blink' : ''} // ถ้าเป็นการ์ดใบใหม่สุด ให้ใส่คลาสกะพริบ
+        className={isNewest ? 'card-blink' : ''} 
         style={{ 
           backgroundColor: '#ffffff', borderRadius: '24px', display: 'flex', 
           flexDirection: 'column', height: '100%', boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
           overflow: 'hidden', position: 'relative',
-          border: isNewest ? '4px solid #EAB308' : '4px solid transparent', // กรอบทองเฉพาะคิวล่าสุด
+          border: isNewest ? '4px solid #EAB308' : '4px solid transparent', 
           zIndex: isNewest ? 10 : 1
         }}
       >
@@ -71,7 +78,7 @@ export default function SmartQueueDisplay() {
             fontSize: 'clamp(14px, 1.5vw, 20px)', fontWeight: 'bold',
             boxShadow: '0 4px 10px rgba(153, 27, 27, 0.4)', zIndex: 5
           }}>
-             คิวด่วน
+            💊 คิวรีฟิลยา
           </div>
         ) : (
           <div style={{
@@ -135,7 +142,7 @@ export default function SmartQueueDisplay() {
 
   return (
     <>
-      {/* แทรก CSS Animation ตรงนี้ให้ระบบกะพริบทำงานได้ชัวร์ 100% */}
+      {/* CSS Animation การกะพริบ */}
       <style>
         {`
           @keyframes flashBlink {
@@ -143,7 +150,7 @@ export default function SmartQueueDisplay() {
             50%, 99% { opacity: 0.15; }
           }
           .card-blink {
-            animation: flashBlink 1s ease-in-out 3; /* กะพริบ 1 วินาที ทำ 3 รอบ */
+            animation: flashBlink 1s ease-in-out 3;
             animation-fill-mode: forwards;
           }
         `}
@@ -161,11 +168,10 @@ export default function SmartQueueDisplay() {
           boxSizing: 'border-box'
         }}>
           {displayQueues.map((q, index) => (
-            // key={q.id} สำคัญมาก เพราะมันบังคับให้ React วาดการ์ดใบใหม่ ทำให้ Animation เล่นใหม่ทุกครั้งที่กด Enter
             <QueueCard 
               key={q ? q.id : `empty-${index}`} 
               data={q} 
-              isNewest={index === 0 && q !== null} // เช็คว่าเป็นใบแรกสุด (ซ้ายบน) หรือไม่
+              isNewest={index === 0 && q !== null} 
             />
           ))}
         </main>
@@ -179,6 +185,7 @@ export default function SmartQueueDisplay() {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             
+            {/* ปุ่มสลับโหมด */}
             <button 
               onClick={() => setIsRefillMode(!isRefillMode)}
               style={{
@@ -189,12 +196,13 @@ export default function SmartQueueDisplay() {
                 transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
               }}
             >
-              <span>{isRefillMode ? 'โหมด: คิวด่วน' : 'โหมด: คิวปกติ'}</span>
+              <span>{isRefillMode ? '💊 โหมด: รีฟิลยา' : 'โหมด: คิวปกติ'}</span>
               <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#D1D5DB' }}>
                 (กด * สลับ)
               </span>
             </button>
 
+            {/* ช่องกรอกข้อมูลเลขคิว */}
             <label style={{ fontSize: '14px', color: '#D1D5DB', fontWeight: 'bold' }}>พิมพ์เลข 4 หลัก:</label>
             <input
               ref={inputRef}
@@ -211,6 +219,28 @@ export default function SmartQueueDisplay() {
                 width: '120px', fontWeight: 'bold', textAlign: 'center', letterSpacing: '2px'
               }}
             />
+
+            {/* เส้นกั้นแบ่งสัดส่วน (Divider) */}
+            <div style={{ width: '1px', height: '35px', backgroundColor: '#4B5563', margin: '0 5px' }}></div>
+
+            {/* ปุ่มล้างกระดาน (อยู่ขวาสุด) */}
+            <button 
+              onClick={handleClearQueue}
+              style={{
+                padding: '6px 15px', fontSize: '14px', fontWeight: 'bold',
+                borderRadius: '6px', cursor: 'pointer', border: '2px solid #4B5563',
+                backgroundColor: '#1F2937', color: '#F87171', // ใช้ตัวหนังสือสีแดงอมส้มให้ดูเป็นปุ่มลบ
+                transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#374151'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1F2937'}
+            >
+              <span>🧹 ล้างคิว</span>
+              <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#9CA3AF' }}>
+                (Clear)
+              </span>
+            </button>
+
           </div>
         </header>
         
