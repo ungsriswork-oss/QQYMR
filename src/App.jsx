@@ -37,7 +37,6 @@ export default function SmartQueueDisplay() {
           isRefill: isRefillMode 
         };
 
-        // *จุดแก้ที่ 1*: เก็บประวัติไว้ 12 คิวเสมอ เพื่อไม่ให้ข้อมูลหายเวลาสลับโหมด
         setQueues((prev) => [newQueue, ...prev].slice(0, 12));
       }
       setInputValue(''); 
@@ -45,16 +44,17 @@ export default function SmartQueueDisplay() {
   };
 
   const QueueCard = ({ data, isNewest }) => {
+    // ปรับขนาดฟอนต์ใหม่ทั้งหมดให้ ใหญ่ กระแทกตา สู้สายตาผู้สูงอายุ
     const fontSizes = gridSize === 6 ? {
-      number: 'clamp(60px, 15vmin, 180px)', 
-      channelText: 'clamp(30px, 5vmin, 80px)',
-      channelNum: 'clamp(50px, 12vmin, 140px)',
-      badge: 'clamp(12px, 1.5vmin, 20px)'
+      number: 'clamp(80px, 22vmin, 260px)',     // ขยายจาก 180px เป็น 260px (ใหญ่มาก)
+      channelText: 'clamp(35px, 6vmin, 90px)',   // ขยายคำว่า "ช่องบริการ"
+      channelNum: 'clamp(60px, 14vmin, 160px)',  // ขยายเลขช่อง
+      badge: 'clamp(14px, 1.8vmin, 24px)'
     } : {
-      number: 'clamp(40px, 10vmin, 110px)',
-      channelText: 'clamp(20px, 3vmin, 50px)',
-      channelNum: 'clamp(30px, 8vmin, 85px)',
-      badge: 'clamp(10px, 1vmin, 14px)'
+      number: 'clamp(50px, 12vmin, 140px)',
+      channelText: 'clamp(24px, 4vmin, 60px)',
+      channelNum: 'clamp(40px, 10vmin, 100px)',
+      badge: 'clamp(10px, 1.2vmin, 16px)'
     };
 
     if (!data) {
@@ -85,25 +85,27 @@ export default function SmartQueueDisplay() {
           <div style={{
             position: 'absolute', top: gridSize === 6 ? '15px' : '8px', right: gridSize === 6 ? '15px' : '8px',
             backgroundColor: '#991B1B', color: '#ffffff',
-            padding: gridSize === 6 ? '5px 15px' : '3px 10px', borderRadius: '50px',
+            padding: gridSize === 6 ? '8px 20px' : '4px 12px', borderRadius: '50px',
             fontSize: fontSizes.badge, fontWeight: 'bold',
             boxShadow: '0 4px 10px rgba(153, 27, 27, 0.4)', zIndex: 5
           }}>
-            💊 คิวรีฟิลยา
+            💊 คิวด่วน
           </div>
         ) : (
           <div style={{
             position: 'absolute', top: gridSize === 6 ? '15px' : '8px', right: gridSize === 6 ? '15px' : '8px',
             backgroundColor: '#F3F4F6', color: '#6B7280',
-            padding: gridSize === 6 ? '5px 15px' : '3px 10px', borderRadius: '50px',
+            padding: gridSize === 6 ? '8px 20px' : '4px 12px', borderRadius: '50px',
             fontSize: fontSizes.badge, fontWeight: 'bold', zIndex: 5
           }}>
             คิวปกติ
           </div>
         )}
 
+        {/* ครึ่งบน: พื้นที่สีขาวสำหรับเลขคิว */}
         <div style={{ 
-          flex: 1.2, display: 'flex', justifyContent: 'center', alignItems: 'center',
+          flex: 7, // ดึงพื้นที่ให้ส่วนนี้กินไป 70-75% ของการ์ด
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
           backgroundColor: data.isRefill ? '#FEE2E2' : '#ffffff', 
           position: 'relative', minHeight: 0 
         }}>
@@ -112,14 +114,16 @@ export default function SmartQueueDisplay() {
             fontWeight: '900', 
             color: data.isRefill ? '#7F1D1D' : '#1F2937', 
             lineHeight: '1', letterSpacing: '2px',
-            marginTop: '10px' 
+            marginTop: '15px' // ดันลงมานิดนึงไม่ให้ชิดป้ายมุมขวาบนเกินไป
           }}>
             {data.number}
           </div>
         </div>
         
+        {/* ครึ่งล่าง: พื้นที่สีเขียวสำหรับช่องบริการ */}
         <div style={{ 
-          flex: 0.8, backgroundColor: '#556B2F', 
+          flex: 2.5, // บีบความสูงพื้นที่สีเขียวให้แคบลงเหลือประมาณ 25-30%
+          backgroundColor: '#556B2F', 
           display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
           minHeight: 0 
         }}>
@@ -132,7 +136,7 @@ export default function SmartQueueDisplay() {
             </span>
             <span style={{ 
               fontSize: fontSizes.channelNum, 
-              color: '#ffffff', fontWeight: '900', textShadow: '3px 3px 6px rgba(0,0,0,0.4)', lineHeight: '0.9' 
+              color: '#ffffff', fontWeight: '900', textShadow: '3px 3px 6px rgba(0,0,0,0.4)', lineHeight: '0.85' 
             }}>
               {data.channel}
             </span>
@@ -142,7 +146,6 @@ export default function SmartQueueDisplay() {
     );
   };
 
-  // *จุดแก้ที่ 2*: ดึงคิวมาแสดงผลตามจำนวนช่องหน้าจอแบบเป๊ะๆ (ตัดปัญหาคิวล้นทะลัก)
   const displayQueues = queues.slice(0, gridSize); 
   
   while (displayQueues.length < gridSize) {
@@ -178,7 +181,7 @@ export default function SmartQueueDisplay() {
           gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows,    
           boxSizing: 'border-box',
           minHeight: 0,
-          overflow: 'hidden' // *จุดป้องกัน*: ถ้ามีอะไรแปลกๆ ล้นมาอีก ให้ตัดทิ้งเลย ห้ามดันแถบล่างเด็ดขาด
+          overflow: 'hidden' 
         }}>
           {displayQueues.map((q, index) => (
             <QueueCard 
@@ -229,7 +232,7 @@ export default function SmartQueueDisplay() {
                 transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
               }}
             >
-              <span>{isRefillMode ? '💊 โหมด: รีฟิลยา' : 'โหมด: คิวปกติ'}</span>
+              <span>{isRefillMode ? '💊 โหมด: คิวด่วน' : 'โหมด: คิวปกติ'}</span>
               <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#D1D5DB' }}>
                 (กด * สลับ)
               </span>
