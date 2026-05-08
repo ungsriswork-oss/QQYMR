@@ -182,3 +182,19 @@
     border-right-color: var(--border);
   }
 }
+
+/* =========================================
+   เพิ่มระบบกระพริบสำหรับคิวล่าสุด (Blinking Animation)
+   ========================================= */
+
+@keyframes blinkQuick {
+  0%, 49%, 100% { opacity: 1; }     /* สว่างสุด (ติด) */
+  50%, 99% { opacity: 0.1; }        /* จางลงเกือบสุด (ดับ) */
+}
+
+.card-newest-blink {
+  /* เรียกใช้ Animation ชื่อ blinkQuick | ใช้เวลา 1 วินาทีต่อรอบ | ทำซ้ำ 3 รอบ */
+  animation: blinkQuick 1s ease-in-out 3; 
+  /* จบ 3 รอบแล้วให้ค้างอยู่ที่สถานะสุดท้าย (สว่างนิ่ง) */
+  animation-fill-mode: forwards; 
+}
