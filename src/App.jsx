@@ -189,7 +189,7 @@ export default function SmartQueueDisplay() {
                 transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
               }}
             >
-              <span>{isRefillMode ? '💊 โหมด: รีฟิลยา' : 'โหมด: คิวปกติ'}</span>
+              <span>{isRefillMode ? 'โหมด: คิวด่วน' : 'โหมด: คิวปกติ'}</span>
               <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#D1D5DB' }}>
                 (กด * สลับ)
               </span>
