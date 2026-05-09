@@ -44,16 +44,16 @@ export default function SmartQueueDisplay() {
   };
 
   const QueueCard = ({ data, isNewest }) => {
-    // ปรับขนาดฟอนต์ของโหมด 12 ช่อง ให้เลขคิวใหญ่ขึ้นเกือบเท่าตัว!
+    // ปรับขนาดฟอนต์โหมด 6 ช่อง: อัดเลขคิวให้ใหญ่สุดๆ (35vmin เพดาน 350px)
     const fontSizes = gridSize === 6 ? {
-      number: 'clamp(80px, 22vmin, 260px)',     
+      number: 'clamp(100px, 30vmin, 350px)',     // ขยายให้เต็มพื้นที่สีขาวสุดๆ
       channelText: 'clamp(45px, 10vmin, 110px)',  
       channelNum: 'clamp(60px, 14vmin, 160px)',   
       badge: 'clamp(14px, 1.8vmin, 24px)'
     } : {
-      number: 'clamp(60px, 18vmin, 220px)',       // อัดให้ใหญ่ขึ้นจาก 12vmin เป็น 18vmin เพดาน 220px
-      channelText: 'clamp(28px, 5vmin, 80px)',    // ขยายคำว่ารับยาช่องขึ้นนิดนึงให้สมดุล
-      channelNum: 'clamp(40px, 8vmin, 110px)',    // ขยายเลขช่องขึ้นนิดนึง
+      number: 'clamp(60px, 18vmin, 220px)',       
+      channelText: 'clamp(28px, 5vmin, 80px)',    
+      channelNum: 'clamp(40px, 8vmin, 110px)',    
       badge: 'clamp(12px, 1.5vmin, 18px)'
     };
 
@@ -113,9 +113,9 @@ export default function SmartQueueDisplay() {
             fontSize: fontSizes.number, 
             fontWeight: '900', 
             color: data.isRefill ? '#7F1D1D' : '#1F2937', 
-            lineHeight: '1', letterSpacing: '2px',
-            // ปรับระยะด้านบนนิดหน่อย เพื่อให้เลขคิว 12 ช่องอยู่กึ่งกลางสวยๆ
-            marginTop: gridSize === 6 ? '15px' : '5px' 
+            lineHeight: '0.85', // บีบระยะบรรทัดลงมา เพื่อให้ตัวอักษรใหญ่สุดๆ แล้วไม่ดันขอบล่าง
+            letterSpacing: '2px',
+            marginTop: '0px' // เอา Margin ออก เพื่อให้ Flexbox จับมันอยู่กึ่งกลางจริงๆ
           }}>
             {data.number}
           </div>
