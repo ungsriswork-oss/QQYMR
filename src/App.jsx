@@ -5,11 +5,12 @@ export default function SmartQueueDisplay() {
   const [inputValue, setInputValue] = useState('');
   const [isRefillMode, setIsRefillMode] = useState(false); 
   const [gridSize, setGridSize] = useState(6); 
+  const [isColorMode, setIsColorMode] = useState(false); 
   const inputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, [queues, isRefillMode, gridSize]);
+  }, [queues, isRefillMode, gridSize, isColorMode]);
 
   const handleClearQueue = () => {
     setQueues([]); 
@@ -37,34 +38,72 @@ export default function SmartQueueDisplay() {
           isRefill: isRefillMode 
         };
 
-        setQueues((prev) => [newQueue, ...prev].slice(0, 12));
+        // เก็บประวัติสูงสุด 24 คิว เพื่อให้ครอบคลุมโหมดที่ใหญ่ที่สุด
+        setQueues((prev) => [newQueue, ...prev].slice(0, 24));
       }
       setInputValue(''); 
     }
   };
 
-  const QueueCard = ({ data, isNewest }) => {
-    // ปรับขนาดฟอนต์ของโหมด 12 ช่อง ให้เลขคิวใหญ่ขึ้นเกือบเท่าตัว!
-    const fontSizes = gridSize === 6 ? {
-      number: 'clamp(80px, 22vmin, 260px)',     
-      channelText: 'clamp(45px, 10vmin, 110px)',  
-      channelNum: 'clamp(60px, 14vmin, 160px)',   
-      badge: 'clamp(14px, 1.8vmin, 24px)'
-    } : {
-      number: 'clamp(60px, 18vmin, 220px)',       // อัดให้ใหญ่ขึ้นจาก 12vmin เป็น 18vmin เพดาน 220px
-      channelText: 'clamp(28px, 5vmin, 80px)',    // ขยายคำว่ารับยาช่องขึ้นนิดนึงให้สมดุล
-      channelNum: 'clamp(40px, 8vmin, 110px)',    // ขยายเลขช่องขึ้นนิดนึง
-      badge: 'clamp(12px, 1.5vmin, 18px)'
+  const getChannelColor = (channel) => {
+    if (!isColorMode) return '#556B2F'; 
+    
+    const channelColors = {
+      '1': '#A16207', 
+      '2': '#2563EB', 
+      '3': '#059669', 
+      '4': '#7C3AED', 
+      '5': '#EA580C', 
+      '6': '#0891B2', 
+      '7': '#DB2777', 
+      '8': '#4F46E5', 
+      '9': '#0F172A', 
     };
+    
+    return channelColors[channel] || '#556B2F'; 
+  };
+
+  const QueueCard = ({ data, isNewest }) => {
+    // ปรับลดขนาดฟอนต์ตามสัดส่วนของ Grid แต่ละโหมด
+    let fontSizes = {};
+    if (gridSize === 6) {
+      fontSizes = {
+        number: 'clamp(80px, 22vmin, 260px)',     
+        channelText: 'clamp(45px, 10vmin, 110px)',  
+        channelNum: 'clamp(60px, 14vmin, 160px)',   
+        badge: 'clamp(14px, 1.8vmin, 24px)'
+      };
+    } else if (gridSize === 12) {
+      fontSizes = {
+        number: 'clamp(60px, 18vmin, 220px)',       
+        channelText: 'clamp(28px, 5vmin, 80px)',    
+        channelNum: 'clamp(40px, 8vmin, 110px)',    
+        badge: 'clamp(12px, 1.5vmin, 18px)'
+      };
+    } else if (gridSize === 18) { // ฟอนต์สำหรับโหมด 18 ช่อง
+      fontSizes = {
+        number: 'clamp(45px, 13vmin, 150px)',       
+        channelText: 'clamp(20px, 3.5vmin, 60px)',    
+        channelNum: 'clamp(30px, 6vmin, 80px)',    
+        badge: 'clamp(11px, 1.2vmin, 16px)'
+      };
+    } else { // 24 ช่อง
+      fontSizes = {
+        number: 'clamp(30px, 9vmin, 100px)',       
+        channelText: 'clamp(14px, 2.5vmin, 40px)',    
+        channelNum: 'clamp(20px, 4vmin, 60px)',    
+        badge: 'clamp(10px, 1vmin, 14px)'
+      };
+    }
 
     if (!data) {
       return (
         <div style={{ 
-          backgroundColor: '#ffffff', borderRadius: gridSize === 6 ? '20px' : '12px', display: 'flex', 
+          backgroundColor: '#ffffff', borderRadius: gridSize >= 12 ? '12px' : '20px', display: 'flex', 
           justifyContent: 'center', alignItems: 'center', height: '100%',
           boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px dashed #D1D5DB'
         }}>
-          <div style={{ fontSize: 'clamp(20px, 3vmin, 40px)', color: '#D1D5DB', fontWeight: 'bold' }}>-- ว่าง --</div>
+          <div style={{ fontSize: gridSize >= 18 ? 'clamp(14px, 2vmin, 24px)' : 'clamp(20px, 3vmin, 40px)', color: '#D1D5DB', fontWeight: 'bold' }}>-- ว่าง --</div>
         </div>
       );
     }
@@ -73,7 +112,7 @@ export default function SmartQueueDisplay() {
       <div 
         className={isNewest ? 'card-blink' : ''} 
         style={{ 
-          backgroundColor: '#ffffff', borderRadius: gridSize === 6 ? '24px' : '16px', display: 'flex', 
+          backgroundColor: '#ffffff', borderRadius: gridSize >= 12 ? '16px' : '24px', display: 'flex', 
           flexDirection: 'column', height: '100%', boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
           overflow: 'hidden', position: 'relative',
           border: isNewest ? '4px solid #EAB308' : '4px solid transparent', 
@@ -83,9 +122,9 @@ export default function SmartQueueDisplay() {
         
         {data.isRefill ? (
           <div style={{
-            position: 'absolute', top: gridSize === 6 ? '15px' : '8px', right: gridSize === 6 ? '15px' : '8px',
+            position: 'absolute', top: gridSize >= 18 ? '4px' : (gridSize === 12 ? '8px' : '15px'), right: gridSize >= 18 ? '4px' : (gridSize === 12 ? '8px' : '15px'),
             backgroundColor: '#991B1B', color: '#ffffff',
-            padding: gridSize === 6 ? '8px 20px' : '4px 12px', borderRadius: '50px',
+            padding: gridSize >= 12 ? '4px 12px' : '8px 20px', borderRadius: '50px',
             fontSize: fontSizes.badge, fontWeight: 'bold',
             boxShadow: '0 4px 10px rgba(153, 27, 27, 0.4)', zIndex: 5
           }}>
@@ -93,16 +132,15 @@ export default function SmartQueueDisplay() {
           </div>
         ) : (
           <div style={{
-            position: 'absolute', top: gridSize === 6 ? '15px' : '8px', right: gridSize === 6 ? '15px' : '8px',
+            position: 'absolute', top: gridSize >= 18 ? '4px' : (gridSize === 12 ? '8px' : '15px'), right: gridSize >= 18 ? '4px' : (gridSize === 12 ? '8px' : '15px'),
             backgroundColor: '#F3F4F6', color: '#6B7280',
-            padding: gridSize === 6 ? '8px 20px' : '4px 12px', borderRadius: '50px',
+            padding: gridSize >= 12 ? '4px 12px' : '8px 20px', borderRadius: '50px',
             fontSize: fontSizes.badge, fontWeight: 'bold', zIndex: 5
           }}>
             ปกติ
           </div>
         )}
 
-        {/* ครึ่งบน: เลขคิว */}
         <div style={{ 
           flex: 7, 
           display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -113,22 +151,21 @@ export default function SmartQueueDisplay() {
             fontSize: fontSizes.number, 
             fontWeight: '900', 
             color: data.isRefill ? '#7F1D1D' : '#1F2937', 
-            lineHeight: '1', letterSpacing: '2px',
-            // ปรับระยะด้านบนนิดหน่อย เพื่อให้เลขคิว 12 ช่องอยู่กึ่งกลางสวยๆ
+            lineHeight: '1', letterSpacing: gridSize >= 18 ? '0px' : '2px',
             marginTop: gridSize === 6 ? '15px' : '5px' 
           }}>
             {data.number}
           </div>
         </div>
         
-        {/* ครึ่งล่าง: รับยาช่อง */}
         <div style={{ 
           flex: 2.5, 
-          backgroundColor: '#556B2F', 
-          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px',
-          minHeight: 0 
+          backgroundColor: getChannelColor(data.channel), 
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: gridSize >= 18 ? '5px' : '10px',
+          minHeight: 0,
+          transition: 'background-color 0.3s ease' 
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: gridSize === 6 ? '15px' : '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: gridSize >= 12 ? '5px' : '15px' }}>
             <span style={{ 
               fontSize: fontSizes.channelText, 
               color: '#ffffff', fontWeight: '900',
@@ -155,8 +192,15 @@ export default function SmartQueueDisplay() {
     displayQueues.push(null);
   }
 
-  const gridTemplateColumns = gridSize === 6 ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)';
-  const gridTemplateRows = gridSize === 6 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+  // คำนวณจำนวนแถวและคอลัมน์ตาม gridSize ให้เหมาะสม
+  let cols, rows;
+  if (gridSize === 6) { cols = 3; rows = 2; }
+  else if (gridSize === 12) { cols = 4; rows = 3; }
+  else if (gridSize === 18) { cols = 6; rows = 3; } // 18 ช่อง: 6 คอลัมน์ 3 แถว
+  else { cols = 6; rows = 4; } // 24 ช่อง: 6 คอลัมน์ 4 แถว
+  
+  const gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const gridTemplateRows = `repeat(${rows}, 1fr)`;
 
   return (
     <>
@@ -180,7 +224,7 @@ export default function SmartQueueDisplay() {
       }}>
         
         <main style={{ 
-          flex: 1, padding: '15px', display: 'grid', gap: '15px',
+          flex: 1, padding: '15px', display: 'grid', gap: gridSize >= 18 ? '8px' : '15px',
           gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows,    
           boxSizing: 'border-box',
           minHeight: 0,
@@ -207,19 +251,46 @@ export default function SmartQueueDisplay() {
             
             <button 
               onClick={() => {
-                setGridSize(gridSize === 6 ? 12 : 6);
+                setIsColorMode(!isColorMode);
+                inputRef.current?.focus();
+              }}
+              style={{
+                padding: '6px 15px', fontSize: '14px', fontWeight: 'bold',
+                borderRadius: '6px', cursor: 'pointer', border: '2px solid',
+                backgroundColor: isColorMode ? '#0D9488' : '#374151',
+                borderColor: isColorMode ? '#0F766E' : '#4B5563', color: '#ffffff',
+                transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
+              }}
+            >
+              <span>{isColorMode ? '🎨 สีแยกช่อง' : '🎨 สีมาตรฐาน'}</span>
+              <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#D1D5DB' }}>
+                (เปลี่ยนโทนสี)
+              </span>
+            </button>
+
+            <div style={{ width: '1px', height: '35px', backgroundColor: '#4B5563', margin: '0 5px' }}></div>
+
+            <button 
+              onClick={() => {
+                // เปลี่ยนลูปเป็น 6 -> 12 -> 18 -> 24 -> 6
+                setGridSize(prev => prev === 6 ? 12 : prev === 12 ? 18 : prev === 18 ? 24 : 6);
                 inputRef.current?.focus();
               }}
               style={{
                 padding: '6px 15px', fontSize: '14px', fontWeight: 'bold',
                 borderRadius: '6px', cursor: 'pointer', border: '2px solid #6366F1',
                 backgroundColor: '#4F46E5', color: '#ffffff',
-                transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center'
+                transition: 'all 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center',
+                width: '140px'
               }}
             >
-              <span>{gridSize === 6 ? '🔳 แสดงผล 12 ช่อง' : '🔲 แสดงผล 6 ช่อง'}</span>
+              <span>
+                {gridSize === 6 ? '🔲 แสดงผล 6 ช่อง' : 
+                 gridSize === 12 ? '🔳 แสดงผล 12 ช่อง' : 
+                 gridSize === 18 ? '▦ แสดงผล 18 ช่อง' : '▦ แสดงผล 24 ช่อง'}
+              </span>
               <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#C7D2FE' }}>
-                (เปลี่ยนขนาดจอ)
+                (คลิกเพื่อเปลี่ยน)
               </span>
             </button>
 
